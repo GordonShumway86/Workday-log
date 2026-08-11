@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Workday Log">
+<meta name="theme-color" content="#1769e0">
 <title>Workday Log</title>
 <style>
 :root{--blue:#1769e0;--red:#b42318;--bg:#f2f4f7;--line:#d0d5dd;--text:#101828;--muted:#667085}
@@ -36,6 +40,8 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 .historyHead button:first-child{background:none;color:var(--text);padding:2px;text-align:left;flex:1}
 .details{display:none;white-space:pre-wrap;font-size:14px;line-height:1.45;margin-top:8px}
 .details.open{display:block}
+.offline{display:none;text-align:center;font-size:12px;color:#946800;background:#fff6e0;border:1px solid #f2d38a;border-radius:8px;padding:6px;margin-top:10px}
+.offline.show{display:block}
 @media(max-width:420px){.note{margin-left:0}.name{width:96px}}
 </style>
 </head>
@@ -45,6 +51,8 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
   <h1>Workday Log</h1>
   <button class="small" onclick="menu()">☰ Menu</button>
 </div>
+
+<div class="offline" id="offlineBanner">No connection — running on this phone. Data is saved locally and the display will refresh automatically once you're back online.</div>
 
 <div class="card hide" id="settings">
   <h2>Show or hide buttons</h2>
@@ -329,6 +337,72 @@ setInterval(()=>{
       String(Math.floor((m%1)*60)).padStart(2,"0");
   }
 },1000);
+
+/* ---- Offline support ---- */
+// All data already lives in localStorage, so button presses, notes, and
+// totals already work with zero connection. The two things added below:
+// 1. A service worker (sw.js) that caches this page itself, so the app
+//    still opens from the home screen with no signal at all.
+// 2. An offline banner + a resync point for when the connection returns.
+//    There's no cloud backend in this app, so "resync" today just means
+//    re-rendering from local storage the moment you're back online. If a
+//    cloud backup is added later, that's the function to hook it into.
+
+function trySync(){
+  render();
+  // Future: if a cloud backend is added, push/pull unsynced days here.
+}
+
+function updateOfflineBanner(){
+  $("#offlineBanner").classList.toggle("show",!navigator.onLine);
+}
+
+window.addEventListener("online",()=>{
+  updateOfflineBanner();
+  trySync();
+});
+window.addEventListener("offline",updateOfflineBanner);
+updateOfflineBanner();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
+const CACHE_NAME = "workday-log-v1";
+const APP_SHELL = ["./", "./index.html"];
+
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      )
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      const network = fetch(event.request)
+        .then((response) => {
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+          return response;
+        })
+        .catch(() => cached);
+      return cached || network;
+    })
+  );
+});
