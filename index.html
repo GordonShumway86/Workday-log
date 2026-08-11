@@ -90,7 +90,7 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 </main>
 
 <script>
-  const K="workday-log-v2";
+const K="workday-log-v2";
 
 const labels={
   start:"Start Day",
@@ -191,9 +191,63 @@ function lunch(n){
     return;
   }
 
+  if(d.lunch&&!confirm(
+    "Lunch is already set to "+d.lunch.minutes+" min. Overwrite it with "+n+" min?"
+  )){
+    return;
+  }
+
   d.lunch={
     time:now(),
     minutes:n,
+    note:d.lunch?.note||""
+  };
+
+  save();
+  render();
+}
+
+function noteChange(k,v){
+  let d=active();
+  if(!d||!d[k])return;
+  d[k].note=v;
+  save();
+}
+
+function row(d,k){
+  let e=d[k];
+  if(!e)return "";
+
+  let timeText=k==="lunch"?e.minutes+" min":short(e.time);
+
+  return `
+    <div class="event">
+      <div class="row">
+        <span class="name">${labels[k]}</span>
+        <span class="time">${timeText}</span>
+      </div>
+      <textarea class="note" placeholder="note"
+        oninput="noteChange('${k}',this.value)">${e.note||""}</textarea>
+    </div>
+  `;
+}
+
+function text(d){
+  let lines=["start","onsite","complete","stop","resume","lunch","end"]
+    .filter(k=>d[k])
+    .map(k=>{
+      let e=d[k];
+      let val=k==="lunch"?e.minutes+" min":short(e.time);
+      let line=labels[k]+": "+val;
+      if(e.note)line+=" — "+e.note;
+      return line;
+    });
+
+  let header=stamp(d.start.time)+" — "+(d.end?"Paid "+fmt(work(d)):"In progress");
+
+  return header+"\n"+lines.join("\n");
+}
+
 function render(){
   let d=active();
 
