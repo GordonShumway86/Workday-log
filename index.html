@@ -55,7 +55,8 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 <div id="noteBackdrop" onclick="document.activeElement.blur()"></div>
 <main>
 <div class="top">
-  <h1>Workday Log</h1>
+  <button class="small" style="visibility:hidden" aria-hidden="true">☰ Menu</button>
+  <h1 style="flex:1;text-align:center">Workday Log</h1>
   <button class="small" onclick="menu()">☰ Menu</button>
 </div>
 
@@ -66,6 +67,11 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
   <div id="toggles"></div>
   <h2 style="margin-top:14px">Options</h2>
   <div id="options"></div>
+  <h2 style="margin-top:14px">History</h2>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">
+    <button class="small" onclick="copyAll(false)">Copy full history</button>
+    <button class="small" onclick="copyAll(true)">Copy full w/ notes</button>
+  </div>
 </div>
 
 <div class="card clock">
@@ -93,21 +99,15 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 </div>
 
 <div class="card">
-  <h2>Today</h2>
+  <h2 style="text-align:center">Today</h2>
   <div id="today" style="margin-top:12px"></div>
 </div>
 
 <div class="card">
-  <div class="top">
-    <h2>History</h2>
-    <div style="display:flex;gap:7px;flex-wrap:wrap">
-      <button class="small" onclick="copyAll(false)">Copy full history</button>
-      <button class="small" onclick="copyAll(true)">Copy full w/ notes</button>
-    </div>
-  </div>
+  <h2 style="text-align:center">History</h2>
   <div id="history" style="margin-top:10px"></div>
 </div>
-<div style="text-align:center;color:#98a2b3;font-size:11px;margin-top:16px">Build 2026-08-12-d</div>
+<div style="text-align:center;color:#98a2b3;font-size:11px;margin-top:16px">Build 2026-08-13-a</div>
 </main>
 
 <script>
