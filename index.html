@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#1769e0">
 <title>Workday Log</title>
 <style>
-:root{--blue:#1769e0;--red:#b42318;--bg:#f2f4f7;--line:#d0d5dd;--text:#101828;--muted:#667085}
+:root{--blue:#1769e0;--red:#b42318;--green:#12805c;--bg:#f2f4f7;--line:#d0d5dd;--text:#101828;--muted:#667085}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 main{max-width:700px;margin:auto;padding:16px 14px 45px}
@@ -18,7 +18,8 @@ h1{font-size:24px;margin:0}h2{font-size:18px;margin:0}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
 button{border:0;border-radius:10px;background:#e7eefc;color:#124395;padding:12px 10px;font-weight:700;font-size:15px;min-height:44px}
 button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{background:var(--red);color:#fff}
-.small{min-height:34px;padding:7px 9px;font-size:13px}.active{outline:3px solid #7eb0ff;background:#dbeafe}
+.small{min-height:34px;padding:7px 9px;font-size:13px}
+.active{outline:3px solid #1f9d63;background:#d1f5df;color:#0b5d3d}
 .clock{text-align:center}.timer{font-size:14px;color:var(--muted)}
 .paid{font-size:38px;font-weight:800;font-variant-numeric:tabular-nums}
 .caption{font-size:12px;color:var(--muted);letter-spacing:.08em}
@@ -27,25 +28,31 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 .lunch label{color:var(--muted);font-size:14px}
 .event{border-top:1px solid var(--line);padding:10px 0}
 .event:first-child{border-top:0;padding-top:0}
-.row{display:flex;gap:7px;align-items:center}
-.name{font-weight:700;width:110px}.time{font-size:17px;font-weight:700;flex:1}
-.note{display:block;margin:7px 0 0 117px;width:15ch;height:30px;line-height:20px;resize:none;overflow:hidden;white-space:nowrap;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:15px inherit}
-.note:focus{width:min(40ch,100%);height:112px;white-space:normal;overflow:auto;outline:2px solid #8db7ff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.name{font-weight:700;width:104px;flex-shrink:0}
+.time{font-size:16px;font-weight:700}
+.time.ded{color:var(--red)}
+.note{width:13ch;height:34px;line-height:18px;resize:none;overflow:hidden;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:14px inherit;flex-shrink:0}
+.note.expanded{position:fixed;left:16px;right:16px;top:18%;height:52vh;width:auto;z-index:60;font-size:16px;line-height:1.4;box-shadow:0 12px 34px rgba(0,0,0,.3)}
+#noteBackdrop{display:none;position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:55}
+#noteBackdrop.show{display:block}
 .hide{display:none!important}
 .setting{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
 .setting:first-child{border-top:0}
 .historyDay{border-top:1px solid var(--line);padding:10px 0}
 .historyDay:first-child{border-top:0}
-.historyHead{display:flex;gap:8px;align-items:center}
-.historyHead button:first-child{background:none;color:var(--text);padding:2px;text-align:left;flex:1}
-.details{display:none;white-space:pre-wrap;font-size:14px;line-height:1.45;margin-top:8px}
+.historyHead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.historyHead button:first-child{background:none;color:var(--text);padding:2px;text-align:left;flex:1;min-width:140px}
+.details{display:none;margin-top:8px}
 .details.open{display:block}
+.summary{border-top:1px solid var(--line);padding:10px 0;font-weight:700}
 .offline{display:none;text-align:center;font-size:12px;color:#946800;background:#fff6e0;border:1px solid #f2d38a;border-radius:8px;padding:6px;margin-top:10px}
 .offline.show{display:block}
-@media(max-width:420px){.note{margin-left:0}.name{width:96px}}
+@media(max-width:420px){.name{width:92px}}
 </style>
 </head>
 <body>
+<div id="noteBackdrop" onclick="document.activeElement.blur()"></div>
 <main>
 <div class="top">
   <h1>Workday Log</h1>
@@ -57,12 +64,14 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 <div class="card hide" id="settings">
   <h2>Show or hide buttons</h2>
   <div id="toggles"></div>
+  <h2 style="margin-top:14px">Options</h2>
+  <div id="options"></div>
 </div>
 
 <div class="card clock">
   <div class="timer" id="timer">Timer 00:00:00</div>
   <div class="paid" id="paid">00:00</div>
-  <div class="caption">PAID TIME</div>
+  <div class="caption">TOTAL PAID</div>
 </div>
 
 <div class="card">
@@ -71,12 +80,12 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
     <button class="end" id="end" onclick="press('end')">End Day</button>
     <button data-show="onsite" onclick="press('onsite')">Onsite</button>
     <button data-show="complete" onclick="press('complete')">Job Complete</button>
-    <button data-show="stop" onclick="press('stop')">Stop</button>
-    <button data-show="resume" onclick="press('resume')">Resume</button>
+    <button data-show="stop" onclick="press('stop')">Unschd Stop</button>
+    <button data-show="resume" onclick="press('resume')">BOTR</button>
   </div>
 
   <div class="lunch" data-show="lunch">
-    <label>Lunch deduction:</label>
+    <label>DTW/L/DTH:</label>
     <button class="small" data-lunch="30" onclick="lunch(30)">30 min</button>
     <button class="small" data-lunch="60" onclick="lunch(60)">60 min</button>
     <button class="small" data-lunch="90" onclick="lunch(90)">90 min</button>
@@ -91,10 +100,14 @@ button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{backgr
 <div class="card">
   <div class="top">
     <h2>History</h2>
-    <button class="small" onclick="copyAll()">Copy full history</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="small" onclick="copyAll(false)">Copy full history</button>
+      <button class="small" onclick="copyAll(true)">Copy full w/ notes</button>
+    </div>
   </div>
   <div id="history" style="margin-top:10px"></div>
 </div>
+<div style="text-align:center;color:#98a2b3;font-size:11px;margin-top:16px">Build 2026-08-12-d</div>
 </main>
 
 <script>
@@ -104,200 +117,230 @@ const labels={
   start:"Start Day",
   onsite:"Onsite",
   complete:"Job Complete",
-  stop:"Stop",
-  resume:"Resume",
-  lunch:"Lunch",
+  stop:"Unschd Stop",
+  resume:"BOTR",
+  lunch:"DTW/L/DTH",
   end:"End Day"
 };
 
 let db=JSON.parse(
   localStorage.getItem(K) ||
-  '{"days":[],"settings":{"onsite":true,"complete":true,"stop":true,"resume":true,"lunch":true}}'
+  '{"days":[],"settings":{"onsite":true,"complete":true,"stop":true,"resume":true,"lunch":true,"deductInstant":false,"showNotesInHistory":false}}'
 );
 
 const $=x=>document.querySelector(x);
 const save=()=>localStorage.setItem(K,JSON.stringify(db));
 const now=()=>new Date().toISOString();
 const active=()=>db.days.find(x=>!x.end);
+const mostRecent=()=>db.days[0];
 
+/* ---- migrate old single-slot day records to the new event-log format ---- */
+function migrate(){
+  let changed=false;
+
+  db.days.forEach(d=>{
+    if(!d.events){
+      d.events=[];
+      ["onsite","complete","stop","resume"].forEach(k=>{
+        if(d[k]){
+          d.events.push({type:k,time:d[k].time,note:d[k].note||""});
+          delete d[k];
+        }
+      });
+      d.events.sort((a,b)=>new Date(a.time)-new Date(b.time));
+      changed=true;
+    }
+  });
+
+  const defaults={onsite:true,complete:true,stop:true,resume:true,lunch:true,deductInstant:false,showNotesInHistory:false};
+  db.settings=Object.assign({},defaults,db.settings||{});
+
+  // one-time fix: earlier versions saved deductInstant as true by default.
+  // Force it to deferred once, then leave it alone so the Menu toggle works normally after this.
+  if(!db.settings.__deferredFix){
+    db.settings.deductInstant=false;
+    db.settings.__deferredFix=true;
+    changed=true;
+  }
+
+  if(changed)save();
+}
+migrate();
+
+/* ---- formatting ---- */
 const fmt=n=>{
   return String(Math.floor(n/60)).padStart(2,"0")+":"+
     String(Math.floor(n%60)).padStart(2,"0");
 };
 
-const stamp=x=>new Intl.DateTimeFormat(undefined,{
-  month:"short",day:"numeric",year:"numeric",
-  hour:"numeric",minute:"2-digit"
-}).format(new Date(x));
+const dur=mins=>{
+  mins=Math.max(0,Math.round(mins));
+  let h=Math.floor(mins/60), m=mins%60;
+  return h+" h "+String(m).padStart(2,"0")+" m";
+};
 
-const short=x=>new Intl.DateTimeFormat(undefined,{
-  hour:"numeric",minute:"2-digit"
-}).format(new Date(x));
+const dateStr=x=>{
+  let d=new Date(x);
+  return String(d.getMonth()+1).padStart(2,"0")+"/"+
+    String(d.getDate()).padStart(2,"0")+"/"+
+    String(d.getFullYear()).slice(-2);
+};
+
+const clock=x=>{
+  let d=new Date(x);
+  let h=d.getHours()%12; if(h===0)h=12;
+  return h+":"+String(d.getMinutes()).padStart(2,"0")+(d.getHours()<12?"am":"pm");
+};
+
+/* ---- time math ---- */
+function totalSpan(d){
+  let finish=new Date(d.end?.time||now());
+  return Math.max(0,(finish-new Date(d.start.time))/60000);
+}
+
+function stopMinutes(d){
+  let total=0;
+  let finish=new Date(d.end?.time||now());
+  let evs=d.events||[];
+  let used=new Set();
+
+  evs.forEach((e,i)=>{
+    if(e.type!=="stop")return;
+    let j=evs.findIndex((x,idx)=>idx>i&&x.type==="resume"&&!used.has(idx));
+    let out=new Date(e.time);
+    let back=j>-1?new Date(evs[j].time):finish;
+    if(j>-1)used.add(j);
+    total+=Math.max(0,(back-out)/60000);
+  });
+
+  return total;
+}
+
+function lunchMinutes(d){
+  if(!d.lunch)return 0;
+  if(db.settings.deductInstant)return d.lunch.minutes;
+  return d.end?d.lunch.minutes:0;
+}
 
 function work(d){
   if(!d)return 0;
-
-  let finish=new Date(d.end?.time||now());
-  let m=(finish-new Date(d.start.time))/60000;
-
-  if(d.stop){
-    let out=new Date(d.stop.time);
-    let back=new Date(d.resume?.time||finish);
-    m-=Math.max(0,(back-out)/60000);
-  }
-
-  return Math.max(0,m-(d.lunch?.minutes||0));
+  return Math.max(0,totalSpan(d)-stopMinutes(d)-lunchMinutes(d));
 }
 
 function elapsed(d){
   if(!d)return 0;
-
   let m=(new Date()-new Date(d.start.time))/60000;
-
-  if(d.stop&&!d.resume){
-    m-=(new Date()-new Date(d.stop.time))/60000;
-  }
-
+  let evs=d.events||[];
+  let lastStopIdx=-1;
+  evs.forEach((e,i)=>{if(e.type==="stop")lastStopIdx=i;});
+  let hasOpenStop=lastStopIdx>-1&&!evs.slice(lastStopIdx+1).some(e=>e.type==="resume");
+  if(hasOpenStop)m-=(new Date()-new Date(evs[lastStopIdx].time))/60000;
   return Math.max(0,m);
 }
 
-function start(){
-  if(active())return;
+/* ---- timeline: merges a day's start/events/lunch/end into one ordered list ---- */
+function timeline(d){
+  const items=[];
+  const evs=d.events||[];
+  const used=new Set();
 
-  db.days.unshift({
-    start:{time:now(),note:""}
+  items.push({ref:"start",label:labels.start,text:clock(d.start.time),note:d.start.note,sort:+new Date(d.start.time),ded:false});
+
+  evs.forEach((e,i)=>{
+    if(e.type==="resume"&&used.has(i))return;
+
+    if(e.type==="stop"){
+      let j=evs.findIndex((x,idx)=>idx>i&&x.type==="resume"&&!used.has(idx));
+      if(j>-1){
+        used.add(j);
+        let mins=(new Date(evs[j].time)-new Date(e.time))/60000;
+        items.push({ref:i,label:labels.stop,text:clock(e.time)+" to "+clock(evs[j].time)+" = "+dur(mins),note:e.note,sort:+new Date(e.time),ded:true});
+      }else{
+        items.push({ref:i,label:labels.stop,text:clock(e.time)+" to —",note:e.note,sort:+new Date(e.time),ded:true});
+      }
+    }else if(e.type==="resume"){
+      items.push({ref:i,label:labels.resume,text:clock(e.time),note:e.note,sort:+new Date(e.time),ded:false});
+    }else{
+      items.push({ref:i,label:labels[e.type],text:clock(e.time),note:e.note,sort:+new Date(e.time),ded:false});
+    }
   });
 
+  if(d.lunch){
+    items.push({ref:"lunch",label:labels.lunch,text:d.lunch.minutes+" m",note:d.lunch.note,sort:+new Date(d.lunch.time),ded:true});
+  }
+
+  items.sort((a,b)=>a.sort-b.sort);
+
+  if(d.end){
+    items.push({ref:"end",label:labels.end,text:clock(d.end.time),note:d.end.note,sort:+new Date(d.end.time),ded:false});
+  }
+
+  return items;
+}
+
+function updateNote(dayIndex,ref,value){
+  const d=db.days[dayIndex];
+  if(!d)return;
+  if(ref==="start")d.start.note=value;
+  else if(ref==="end"){if(d.end)d.end.note=value;}
+  else if(ref==="lunch"){if(d.lunch)d.lunch.note=value;}
+  else{const i=Number(ref);if(d.events[i])d.events[i].note=value;}
+  save();
+}
+
+function itemRowHTML(it,dayIndex,showNotes){
+  const cls=it.ded?" ded":"";
+  const note=showNotes
+    ?`<textarea class="note" placeholder="note"
+        oninput="updateNote(${dayIndex},'${it.ref}',this.value)"
+        onfocus="this.classList.add('expanded');$('#noteBackdrop').classList.add('show')"
+        onblur="this.classList.remove('expanded');$('#noteBackdrop').classList.remove('show')">${it.note||""}</textarea>`
+    :"";
+  return `
+    <div class="event">
+      <div class="row">
+        <span class="name">${it.label}</span>
+        <span class="time${cls}">${it.text}</span>
+        ${note}
+      </div>
+    </div>
+  `;
+}
+
+/* ---- actions ---- */
+function start(){
+  if(active())return;
+  db.days.unshift({start:{time:now(),note:""},events:[]});
   save();
   render();
 }
 
 function press(k){
   let d=active();
+  if(!d){alert("Press Start Day first.");return;}
 
-  if(!d){
-    alert("Press Start Day first.");
+  if(k==="end"){
+    d.end={time:now(),note:d.end?.note||""};
+    save();render();
     return;
   }
 
-  if(d[k]&&!confirm(
-    labels[k]+" has already been pressed. Overwrite its timestamp with the current time?"
-  )){
-    return;
-  }
+  if(d.lastEvent===k&&!confirm(labels[k]+" was just pressed. Press it again?"))return;
 
-  d[k]={time:now(),note:d[k]?.note||""};
+  d.events.push({type:k,time:now(),note:""});
+  d.lastEvent=k;
   save();
   render();
 }
 
 function lunch(n){
   let d=active();
+  if(!d){alert("Press Start Day first.");return;}
 
-  if(!d){
-    alert("Press Start Day first.");
-    return;
-  }
-
-  if(d.lunch&&!confirm(
-    "Lunch is already set to "+d.lunch.minutes+" min. Overwrite it with "+n+" min?"
-  )){
-    return;
-  }
-
-  d.lunch={
-    time:now(),
-    minutes:n,
-    note:d.lunch?.note||""
-  };
-
+  d.lunch={time:now(),minutes:n,note:d.lunch?.note||""};
+  d.lastEvent="lunch";
   save();
   render();
-}
-
-function noteChange(k,v){
-  let d=active();
-  if(!d||!d[k])return;
-  d[k].note=v;
-  save();
-}
-
-function row(d,k){
-  let e=d[k];
-  if(!e)return "";
-
-  let timeText=k==="lunch"?e.minutes+" min":short(e.time);
-
-  return `
-    <div class="event">
-      <div class="row">
-        <span class="name">${labels[k]}</span>
-        <span class="time">${timeText}</span>
-      </div>
-      <textarea class="note" placeholder="note"
-        oninput="noteChange('${k}',this.value)">${e.note||""}</textarea>
-    </div>
-  `;
-}
-
-function text(d){
-  let lines=["start","onsite","complete","stop","resume","lunch","end"]
-    .filter(k=>d[k])
-    .map(k=>{
-      let e=d[k];
-      let val=k==="lunch"?e.minutes+" min":short(e.time);
-      let line=labels[k]+": "+val;
-      if(e.note)line+=" — "+e.note;
-      return line;
-    });
-
-  let header=stamp(d.start.time)+" — "+(d.end?"Paid "+fmt(work(d)):"In progress");
-
-  return header+"\n"+lines.join("\n");
-}
-
-function render(){
-  let d=active();
-
-  $("#paid").textContent=fmt(work(d));
-  $("#start").disabled=!!d;
-  $("#end").disabled=!d;
-
-  $("#today").innerHTML=d
-    ?["start","onsite","complete","stop","resume","lunch","end"]
-      .map(k=>row(d,k)).join("")
-    :"<span style='color:#667085'>No active day. Press Start Day to begin.</span>";
-
-  document.querySelectorAll("[data-lunch]").forEach(b=>{
-    b.classList.toggle("active",d?.lunch?.minutes==b.dataset.lunch);
-  });
-
-  document.querySelectorAll("[data-show]").forEach(x=>{
-    x.classList.toggle("hide",!db.settings[x.dataset.show]);
-  });
-
-  $("#toggles").innerHTML=Object.keys(db.settings).map(k=>`
-    <label class="setting">
-      ${k==="complete"?"Job Complete":k[0].toUpperCase()+k.slice(1)}
-      <input type="checkbox"
-        ${db.settings[k]?"checked":""}
-        onchange="toggle('${k}',this.checked)">
-    </label>
-  `).join("");
-
-  $("#history").innerHTML=db.days.length
-    ?db.days.map((d,i)=>`
-      <div class="historyDay">
-        <div class="historyHead">
-          <button onclick="document.getElementById('d${i}').classList.toggle('open')">
-            ${stamp(d.start.time)} — ${d.end?"Paid "+fmt(work(d)):"In progress"}
-          </button>
-          <button class="small" onclick="copy('${encodeURIComponent(text(d))}')">Copy</button>
-        </div>
-        <div class="details" id="d${i}">${text(d)}</div>
-      </div>
-    `).join("")
-    :"<span style='color:#667085'>Completed days appear here.</span>";
 }
 
 function toggle(k,v){
@@ -315,42 +358,142 @@ function copy(s){
   alert("Copied.");
 }
 
-function copyAll(){
-  copy(
-    encodeURIComponent(
-      db.days.slice().reverse().map(text).join("\n\n")
-    )
-  );
+function dayText(d,withNotes){
+  const items=timeline(d);
+  const lines=items.map(it=>{
+    let line=it.label+" "+it.text;
+    if(withNotes&&it.note)line+=" — "+it.note;
+    return line;
+  });
+  lines.push("Total  "+dur(totalSpan(d)));
+  lines.push("Total Paid  "+dur(work(d)));
+  return dateStr(d.start.time)+"\n"+lines.join("\n");
+}
+
+function copyDay(i,withNotes){
+  const d=db.days[i];
+  if(!d)return;
+  copy(encodeURIComponent(dayText(d,withNotes)));
+}
+
+function copyAll(withNotes){
+  copy(encodeURIComponent(
+    db.days.slice().reverse().map(d=>dayText(d,withNotes)).join("\n\n")
+  ));
+}
+
+/* ---- render ---- */
+function renderToday(){
+  const d=active();
+  const idx=d?db.days.indexOf(d):-1;
+
+  $("#today").innerHTML=d
+    ?timeline(d).map(it=>itemRowHTML(it,idx,true)).join("")
+    :"<span style='color:#667085'>No active day. Press Start Day to begin.</span>";
+}
+
+function historyDetailHTML(d,i){
+  const rows=timeline(d).map(it=>itemRowHTML(it,i,db.settings.showNotesInHistory)).join("");
+  const summary=`
+    <div class="summary">Total &nbsp; ${dur(totalSpan(d))}</div>
+    <div class="summary">Total Paid &nbsp; ${dur(work(d))}</div>
+  `;
+  return rows+summary;
+}
+
+function renderHistory(){
+  $("#history").innerHTML=db.days.length
+    ?db.days.map((d,i)=>`
+      <div class="historyDay">
+        <div class="historyHead">
+          <button onclick="document.getElementById('d${i}').classList.toggle('open')">
+            ${dateStr(d.start.time)} — ${d.end?"Paid "+fmt(work(d)):"In progress"}
+          </button>
+          <button class="small" onclick="copyDay(${i},false)">Copy</button>
+          <button class="small" onclick="copyDay(${i},true)">Copy w/ Notes</button>
+        </div>
+        <div class="details" id="d${i}">${historyDetailHTML(d,i)}</div>
+      </div>
+    `).join("")
+    :"<span style='color:#667085'>Completed days appear here.</span>";
+}
+
+function render(){
+  let d=active();
+  let display=d||mostRecent();
+
+  $("#paid").textContent=display?fmt(work(display)):"00:00";
+  $("#start").disabled=!!d;
+  $("#end").disabled=!d;
+
+  renderToday();
+
+  document.querySelectorAll("[data-lunch]").forEach(b=>{
+    b.classList.toggle("active",d?.lunch?.minutes==b.dataset.lunch);
+  });
+
+  document.querySelectorAll("[data-show]").forEach(x=>{
+    x.classList.toggle("hide",!db.settings[x.dataset.show]);
+  });
+
+  $("#toggles").innerHTML=["onsite","complete","stop","resume","lunch"].map(k=>`
+    <label class="setting">
+      ${labels[k]}
+      <input type="checkbox"
+        ${db.settings[k]?"checked":""}
+        onchange="toggle('${k}',this.checked)">
+    </label>
+  `).join("");
+
+  $("#options").innerHTML=`
+    <label class="setting">
+      Deduct DTW/L/DTH instantly
+      <input type="checkbox" ${db.settings.deductInstant?"checked":""}
+        onchange="toggle('deductInstant',this.checked)">
+    </label>
+    <label class="setting">
+      Show notes in history
+      <input type="checkbox" ${db.settings.showNotesInHistory?"checked":""}
+        onchange="toggle('showNotesInHistory',this.checked)">
+    </label>
+  `;
+
+  renderHistory();
 }
 
 render();
 
 setInterval(()=>{
   let d=active();
+  let display=d||mostRecent();
+
+  if(!display){
+    $("#paid").textContent="00:00";
+    $("#timer").textContent="Timer 00:00:00";
+    return;
+  }
+
+  $("#paid").textContent=fmt(work(display));
 
   if(d){
-    $("#paid").textContent=fmt(work(d));
-
     let m=elapsed(d);
     $("#timer").textContent=
       "Timer "+fmt(m)+":"+
       String(Math.floor((m%1)*60)).padStart(2,"0");
+  }else{
+    $("#timer").textContent="Timer "+fmt(totalSpan(display))+":00";
   }
 },1000);
 
 /* ---- Offline support ---- */
-// All data already lives in localStorage, so button presses, notes, and
-// totals already work with zero connection. The two things added below:
-// 1. A service worker (sw.js) that caches this page itself, so the app
-//    still opens from the home screen with no signal at all.
-// 2. An offline banner + a resync point for when the connection returns.
-//    There's no cloud backend in this app, so "resync" today just means
-//    re-rendering from local storage the moment you're back online. If a
-//    cloud backup is added later, that's the function to hook it into.
+// All data lives in localStorage, so button presses, notes, and totals
+// already work with zero connection. sw.js caches this page itself so the
+// app still opens from the home screen with no signal at all. There's no
+// cloud backend in this app, so "resync" just means re-rendering from
+// local storage the moment you're back online.
 
 function trySync(){
   render();
-  // Future: if a cloud backend is added, push/pull unsynced days here.
 }
 
 function updateOfflineBanner(){
@@ -372,37 +515,3 @@ if("serviceWorker" in navigator){
 </script>
 </body>
 </html>
-const CACHE_NAME = "workday-log-v1";
-const APP_SHELL = ["./", "./index.html"];
-
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-      )
-      .then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((response) => {
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
-  );
-});
