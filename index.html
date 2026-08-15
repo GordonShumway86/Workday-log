@@ -6,108 +6,194 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Workday Log">
-<meta name="theme-color" content="#1769e0">
+<meta name="theme-color" content="#0891B2">
 <title>Workday Log</title>
 <style>
-:root{--blue:#1769e0;--red:#b42318;--green:#12805c;--bg:#f2f4f7;--line:#d0d5dd;--text:#101828;--muted:#667085}
+:root{
+  --ink:#101828;
+  --ink-soft:#475467;
+  --muted:#667085;
+  --faint:#98a2b3;
+  --bg:#eef1f6;
+  --card:#ffffff;
+  --line:#e2e8f0;
+  --brand:#0891b2;
+  --brand-dark:#0c4a6e;
+  --brand-tint:#cdeef5;
+  --copper:#c2410c;
+  --copper-tint:#fde4d3;
+  --green:#15803d;
+  --green-bg:#dcfce7;
+  --green-line:#22c55e;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 1px 2px rgba(16,24,40,.04), 0 4px 10px rgba(16,24,40,.06);
+  --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:700px;margin:auto;padding:16px 14px 45px}
+html{-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:480px;margin:auto;padding:18px 16px 48px}
+
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-h1{font-size:24px;margin:0}h2{font-size:18px;margin:0}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-button{border:0;border-radius:10px;background:#e7eefc;color:#124395;padding:12px 10px;font-weight:700;font-size:15px;min-height:44px}
-button:active{opacity:.75}.primary{background:var(--blue);color:#fff}.end{background:var(--red);color:#fff}
-.small{min-height:34px;padding:7px 9px;font-size:13px}
-.active{outline:3px solid #1f9d63;background:#d1f5df;color:#0b5d3d}
-.clock{text-align:center}.timer{font-size:14px;color:var(--muted)}
-.paid{font-size:38px;font-weight:800;font-variant-numeric:tabular-nums}
-.caption{font-size:12px;color:var(--muted);letter-spacing:.08em}
+.brand{display:flex;align-items:center;gap:8px}
+.brand svg{color:var(--brand);flex-shrink:0}
+h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.01em}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin:0 0 10px 2px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:14px;box-shadow:var(--shadow)}
+
+button{border:0;border-radius:var(--radius-sm);background:var(--brand-tint);color:var(--brand-dark);padding:13px 10px;font-weight:700;font-size:14.5px;min-height:46px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:var(--shadow-sm);transition:transform .08s ease, box-shadow .08s ease}
+button:active{transform:scale(.97);box-shadow:none}
+button:disabled{opacity:.4}
+.primary{background:var(--brand);color:#fff}
+.end{background:var(--copper);color:#fff}
+.small{min-height:36px;padding:8px 10px;font-size:12.5px;box-shadow:none;background:var(--bg)}
+.active{background:var(--green-bg);color:var(--green);box-shadow:inset 0 0 0 1.5px var(--green-line)}
+
+.menuBtn{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);box-shadow:none;padding:9px 12px;font-size:12.5px;min-height:38px}
+
+.clock{text-align:center;padding-top:18px}
+.timer{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.gauge{width:172px;height:172px;margin:14px auto 2px;border-radius:50%;padding:9px;background:conic-gradient(from -90deg, var(--brand) 0deg 205deg, var(--copper) 205deg 360deg);display:flex;box-shadow:var(--shadow)}
+.gaugeInner{flex:1;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--line)}
+.paid{font-size:38px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.caption{font-size:11px;color:var(--muted);letter-spacing:.09em;font-weight:700;margin-top:2px}
+
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.lunch{margin-top:12px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.lunch label{color:var(--muted);font-size:14px}
-.event{border-top:1px solid var(--line);padding:10px 0}
+
+.lunch{margin-top:16px}
+.lunch label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.lunchRow{display:flex;gap:7px}
+.lunchRow button{flex:1}
+
+.event{border-top:1px solid var(--line);padding:11px 0}
 .event:first-child{border-top:0;padding-top:0}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.name{font-weight:700;width:104px;flex-shrink:0}
-.time{font-size:16px;font-weight:700}
-.time.ded{color:var(--red)}
-.note{width:13ch;height:34px;line-height:18px;resize:none;overflow:hidden;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:14px inherit;flex-shrink:0}
-.note.expanded{position:fixed;left:16px;right:16px;top:18%;height:52vh;width:auto;z-index:60;font-size:16px;line-height:1.4;box-shadow:0 12px 34px rgba(0,0,0,.3)}
-#noteBackdrop{display:none;position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:55}
+.name{font-weight:600;width:104px;flex-shrink:0;color:var(--ink-soft);font-size:14px}
+.time{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.time.ded{color:var(--copper)}
+.note{width:13ch;height:34px;line-height:18px;resize:none;overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:5px 7px;font:14px inherit;flex-shrink:0;background:var(--bg)}
+.note:focus{outline:2px solid var(--brand);outline-offset:1px}
+.note.expanded{position:fixed;left:16px;right:16px;top:18%;height:52vh;width:auto;z-index:60;font-size:16px;line-height:1.4;box-shadow:0 20px 50px rgba(16,24,40,.35);background:var(--card)}
+#noteBackdrop{display:none;position:fixed;inset:0;background:rgba(16,24,40,.4);backdrop-filter:blur(2px);z-index:55}
 #noteBackdrop.show{display:block}
+
 .hide{display:none!important}
-.setting{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
+
+.setting{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:14.5px}
 .setting:first-child{border-top:0}
-.historyDay{border-top:1px solid var(--line);padding:10px 0}
+input[type=checkbox]{accent-color:var(--brand);width:19px;height:19px}
+
+.historyDay{border-top:1px solid var(--line);padding:12px 0}
 .historyDay:first-child{border-top:0}
 .historyHead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.historyHead button:first-child{background:none;color:var(--text);padding:2px;text-align:left;flex:1;min-width:140px}
-.details{display:none;margin-top:8px}
+.historyHead button:first-child{background:none;color:var(--ink);padding:2px;text-align:left;flex:1;min-width:140px;box-shadow:none;font-size:14.5px;font-weight:700;justify-content:flex-start}
+.details{display:none;margin-top:10px}
 .details.open{display:block}
-.summary{border-top:1px solid var(--line);padding:10px 0;font-weight:700}
-.offline{display:none;text-align:center;font-size:12px;color:#946800;background:#fff6e0;border:1px solid #f2d38a;border-radius:8px;padding:6px;margin-top:10px}
+.summary{border-top:1px solid var(--line);padding:10px 0;font-weight:700;font-size:14.5px}
+
+.offline{display:none;text-align:center;font-size:12.5px;color:#8a5300;background:#fff6e0;border:1px solid #f2d38a;border-radius:10px;padding:9px;margin-top:12px;font-weight:600}
 .offline.show{display:block}
-@media(max-width:420px){.name{width:92px}}
+
+.foot{text-align:center;color:var(--faint);font-size:11px;margin-top:20px;letter-spacing:.03em}
+
+@media(max-width:380px){.name{width:88px}.gauge{width:154px;height:154px}.paid{font-size:33px}}
+@media(prefers-reduced-motion:reduce){button{transition:none}button:active{transform:none}}
 </style>
 </head>
 <body>
 <div id="noteBackdrop" onclick="document.activeElement.blur()"></div>
 <main>
 <div class="top">
-  <button class="small" style="visibility:hidden" aria-hidden="true">☰ Menu</button>
-  <h1 style="flex:1;text-align:center">Workday Log</h1>
-  <button class="small" onclick="menu()">☰ Menu</button>
+  <div class="brand">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-2.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <h1>Workday Log</h1>
+  </div>
+  <button class="menuBtn" onclick="menu()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <span>Menu</span>
+  </button>
 </div>
 
 <div class="offline" id="offlineBanner">No connection — running on this phone. Data is saved locally and the display will refresh automatically once you're back online.</div>
 
 <div class="card hide" id="settings">
-  <h2>Show or hide buttons</h2>
+  <div class="eyebrow" style="margin-top:0">Show or hide buttons</div>
   <div id="toggles"></div>
-  <h2 style="margin-top:14px">Options</h2>
+  <div class="eyebrow" style="margin-top:18px">Options</div>
   <div id="options"></div>
-  <h2 style="margin-top:14px">History</h2>
-  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">
-    <button class="small" onclick="copyAll(false)">Copy full history</button>
-    <button class="small" onclick="copyAll(true)">Copy full w/ notes</button>
+  <div class="eyebrow" style="margin-top:18px">History</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+    <button class="small" onclick="copyAll(false)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      <span>Copy full history</span>
+    </button>
+    <button class="small" onclick="copyAll(true)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      <span>Copy full w/ notes</span>
+    </button>
   </div>
 </div>
 
 <div class="card clock">
   <div class="timer" id="timer">Timer 00:00:00</div>
-  <div class="paid" id="paid">00:00</div>
-  <div class="caption">TOTAL PAID</div>
+  <div class="gauge">
+    <div class="gaugeInner">
+      <div class="paid" id="paid">00:00</div>
+      <div class="caption">TOTAL PAID</div>
+    </div>
+  </div>
 </div>
 
 <div class="card">
   <div class="buttons">
-    <button class="primary" id="start" onclick="start()">Start Day</button>
-    <button class="end" id="end" onclick="press('end')">End Day</button>
-    <button data-show="onsite" onclick="press('onsite')">Onsite</button>
-    <button data-show="complete" onclick="press('complete')">Job Complete</button>
-    <button data-show="stop" onclick="press('stop')">Unschd Stop</button>
-    <button data-show="resume" onclick="press('resume')">BOTR</button>
+    <button class="primary" id="start" onclick="start()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 5v14l12-7z" fill="currentColor"/></svg>
+      <span>Start Day</span>
+    </button>
+    <button class="end" id="end" onclick="press('end')">
+      <svg width="18" height="18" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>
+      <span>End Day</span>
+    </button>
+    <button data-show="onsite" onclick="press('onsite')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>
+      <span>Onsite</span>
+    </button>
+    <button data-show="complete" onclick="press('complete')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+      <span>Job Complete</span>
+    </button>
+    <button data-show="stop" onclick="press('stop')">
+      <svg width="18" height="18" viewBox="0 0 24 24"><rect x="7" y="5" width="3.5" height="14" rx="1" fill="currentColor"/><rect x="13.5" y="5" width="3.5" height="14" rx="1" fill="currentColor"/></svg>
+      <span>Unschd Stop</span>
+    </button>
+    <button data-show="resume" onclick="press('resume')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4h4"/></svg>
+      <span>BOTR</span>
+    </button>
   </div>
 
   <div class="lunch" data-show="lunch">
     <label>DTW/L/DTH:</label>
-    <button class="small" data-lunch="30" onclick="lunch(30)">30 min</button>
-    <button class="small" data-lunch="60" onclick="lunch(60)">60 min</button>
-    <button class="small" data-lunch="90" onclick="lunch(90)">90 min</button>
+    <div class="lunchRow">
+      <button class="small" data-lunch="30" onclick="lunch(30)">30 min</button>
+      <button class="small" data-lunch="60" onclick="lunch(60)">60 min</button>
+      <button class="small" data-lunch="90" onclick="lunch(90)">90 min</button>
+    </div>
   </div>
 </div>
 
 <div class="card">
-  <h2 style="text-align:center">Today</h2>
-  <div id="today" style="margin-top:12px"></div>
+  <div class="eyebrow" style="margin-top:0">Today</div>
+  <div id="today" style="margin-top:4px"></div>
 </div>
 
 <div class="card">
-  <h2 style="text-align:center">History</h2>
-  <div id="history" style="margin-top:10px"></div>
+  <div class="eyebrow" style="margin-top:0">History</div>
+  <div id="history" style="margin-top:4px"></div>
 </div>
-<div style="text-align:center;color:#98a2b3;font-size:11px;margin-top:16px">Build 2026-08-13-a</div>
+<div class="foot">Build 2026-08-13-a</div>
 </main>
 
 <script>
