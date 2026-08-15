@@ -7,29 +7,38 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Workday Log">
 <link rel="apple-touch-icon" href="./icon-180.png">
-<meta name="theme-color" content="#0891B2">
+<meta name="theme-color" content="#0a0e1a">
 <title>Workday Log</title>
 <style>
 :root{
-  --ink:#101828;
-  --ink-soft:#475467;
-  --muted:#667085;
-  --faint:#98a2b3;
-  --bg:#eef1f6;
-  --card:#ffffff;
-  --line:#e2e8f0;
-  --brand:#0891b2;
-  --brand-dark:#0c4a6e;
-  --brand-tint:#cdeef5;
-  --copper:#c2410c;
-  --copper-tint:#fde4d3;
-  --green:#15803d;
-  --green-bg:#dcfce7;
-  --green-line:#22c55e;
+  --ink:#f2f4f7;
+  --ink-soft:#c7ccd3;
+  --muted:#8a8f99;
+  --faint:#5b6068;
+  --bg:#0a0e1a;
+  --card:#131829;
+  --card-alt:#3a3f46;
+  --card-alt-light:#4c525a;
+  --line:rgba(255,255,255,.08);
+  --outline:rgba(255,255,255,.18);
+  --brand:#6f9ec9;
+  --navy-top:#4d6f95;
+  --navy-bottom:#28405c;
+  --maroon-top:#8a4030;
+  --maroon-bottom:#4a2015;
+  --gold:#cf9a34;
+  --gold-light:#e8bd66;
+  --gold-text:#241a08;
+  --copper:#e2724a;
+  --gauge-s-l:#eef0f3;
+  --gauge-s-m:#9aa1ab;
+  --gauge-s-d:#565c66;
+  --gauge-green:#33b37a;
+  --gauge-red:#e5522b;
   --radius:16px;
   --radius-sm:10px;
-  --shadow:0 1px 2px rgba(16,24,40,.04), 0 4px 10px rgba(16,24,40,.06);
-  --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+  --shadow:0 8px 22px rgba(0,0,0,.55);
+  --shadow-sm:0 3px 9px rgba(0,0,0,.4);
 }
 *{box-sizing:border-box}
 html{-webkit-tap-highlight-color:transparent}
@@ -42,24 +51,30 @@ main{max-width:480px;margin:auto;padding:18px 16px 48px}
 h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.01em}
 .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin:0 0 10px 2px}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:14px;box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--outline);border-radius:var(--radius);padding:16px;margin-top:14px;box-shadow:var(--shadow)}
 
-button{border:0;border-radius:var(--radius-sm);background:var(--brand-tint);color:var(--brand-dark);padding:13px 10px;font-weight:700;font-size:14.5px;min-height:46px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:var(--shadow-sm);transition:transform .08s ease, box-shadow .08s ease}
+button{border:1px solid var(--outline);border-radius:var(--radius-sm);background:linear-gradient(180deg,var(--card-alt-light),var(--card-alt));color:var(--ink-soft);padding:13px 10px;font-weight:700;font-size:14.5px;min-height:46px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.08);transition:transform .08s ease, box-shadow .08s ease}
 button:active{transform:scale(.97);box-shadow:none}
 button:disabled{opacity:.4}
-.primary{background:var(--brand);color:#fff}
-.end{background:var(--copper);color:#fff}
-.small{min-height:36px;padding:8px 10px;font-size:12.5px;box-shadow:none;background:var(--bg)}
-.active{background:var(--green-bg);color:var(--green);box-shadow:inset 0 0 0 1.5px var(--green-line)}
+.primary{background:linear-gradient(180deg,var(--navy-top),var(--navy-bottom));color:#fff}
+.end{background:linear-gradient(180deg,var(--maroon-top),var(--maroon-bottom));color:#fff}
+.small{min-height:36px;padding:8px 10px;font-size:12.5px;box-shadow:none;background:var(--card-alt)}
+.active{background:linear-gradient(180deg,var(--gold-light),var(--gold));color:var(--gold-text);box-shadow:none;font-weight:800}
 
-.menuBtn{background:var(--card);color:var(--ink-soft);border:1px solid var(--line);box-shadow:none;padding:9px 12px;font-size:12.5px;min-height:38px}
+.menuBtn{background:var(--card);color:var(--ink-soft);border:1px solid var(--outline);box-shadow:none;padding:9px 12px;font-size:12.5px;min-height:38px}
 
 .clock{text-align:center;padding-top:18px}
-.timer{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em}
-.gauge{width:172px;height:172px;margin:14px auto 2px;border-radius:50%;padding:9px;background:conic-gradient(from -90deg, var(--brand) 0deg 205deg, var(--copper) 205deg 360deg);display:flex;box-shadow:var(--shadow)}
-.gaugeInner{flex:1;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--line)}
-.paid{font-size:38px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.caption{font-size:11px;color:var(--muted);letter-spacing:.09em;font-weight:700;margin-top:2px}
+.timer{font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.gauge{position:relative;width:172px;height:172px;margin:14px auto 2px;border-radius:50%;padding:11px;box-shadow:var(--shadow);background:conic-gradient(from -90deg,
+    var(--gauge-s-l) 0deg 35deg, var(--gauge-s-d) 35deg 70deg, var(--gauge-s-m) 70deg 110deg,
+    var(--gauge-s-l) 110deg 150deg, var(--gauge-s-d) 150deg 190deg,
+    var(--gauge-green) 195deg 250deg, var(--gauge-red) 250deg 340deg,
+    var(--gauge-s-l) 345deg 360deg);display:flex}
+.ticks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ticks line{stroke:rgba(0,0,0,.32)}
+.gaugeInner{flex:1;border-radius:50%;background:radial-gradient(circle at 50% 35%, #202329, #101216 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.05);gap:1px}
+.paid{font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink)}
+.caption{font-size:10.5px;color:var(--muted);letter-spacing:.09em;font-weight:700;margin-top:2px}
 
 .buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 
@@ -74,10 +89,10 @@ button:disabled{opacity:.4}
 .name{font-weight:600;width:104px;flex-shrink:0;color:var(--ink-soft);font-size:14px}
 .time{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
 .time.ded{color:var(--copper)}
-.note{width:13ch;height:34px;line-height:18px;resize:none;overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:5px 7px;font:14px inherit;flex-shrink:0;background:var(--bg)}
+.note{width:13ch;height:34px;line-height:18px;resize:none;overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:5px 7px;font:14px inherit;flex-shrink:0;background:var(--card-alt);color:var(--ink)}
 .note:focus{outline:2px solid var(--brand);outline-offset:1px}
-.note.expanded{position:fixed;left:16px;right:16px;top:18%;height:52vh;width:auto;z-index:60;font-size:16px;line-height:1.4;box-shadow:0 20px 50px rgba(16,24,40,.35);background:var(--card)}
-#noteBackdrop{display:none;position:fixed;inset:0;background:rgba(16,24,40,.4);backdrop-filter:blur(2px);z-index:55}
+.note.expanded{position:fixed;left:16px;right:16px;top:18%;height:52vh;width:auto;z-index:60;font-size:16px;line-height:1.4;box-shadow:0 20px 50px rgba(0,0,0,.6);background:var(--card)}
+#noteBackdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:55}
 #noteBackdrop.show{display:block}
 
 .hide{display:none!important}
@@ -89,12 +104,12 @@ input[type=checkbox]{accent-color:var(--brand);width:19px;height:19px}
 .historyDay{border-top:1px solid var(--line);padding:12px 0}
 .historyDay:first-child{border-top:0}
 .historyHead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.historyHead button:first-child{background:none;color:var(--ink);padding:2px;text-align:left;flex:1;min-width:140px;box-shadow:none;font-size:14.5px;font-weight:700;justify-content:flex-start}
+.historyHead button:first-child{background:none;border:0;color:var(--ink);padding:2px;text-align:left;flex:1;min-width:140px;box-shadow:none;font-size:14.5px;font-weight:700;justify-content:flex-start}
 .details{display:none;margin-top:10px}
 .details.open{display:block}
 .summary{border-top:1px solid var(--line);padding:10px 0;font-weight:700;font-size:14.5px}
 
-.offline{display:none;text-align:center;font-size:12.5px;color:#8a5300;background:#fff6e0;border:1px solid #f2d38a;border-radius:10px;padding:9px;margin-top:12px;font-weight:600}
+.offline{display:none;text-align:center;font-size:12.5px;color:#e8c273;background:rgba(201,150,45,.12);border:1px solid rgba(201,150,45,.4);border-radius:10px;padding:9px;margin-top:12px;font-weight:600}
 .offline.show{display:block}
 
 .foot{text-align:center;color:var(--faint);font-size:11px;margin-top:20px;letter-spacing:.03em}
@@ -138,9 +153,59 @@ input[type=checkbox]{accent-color:var(--brand);width:19px;height:19px}
 </div>
 
 <div class="card clock">
-  <div class="timer" id="timer">Timer 00:00:00</div>
   <div class="gauge">
+    <svg class="ticks" viewBox="0 0 200 200">
+<line x1="100.0" y1="20.0" x2="100.0" y2="4.0" stroke-width="2.6"/>
+<line x1="111.2" y1="14.7" x2="112.5" y2="4.8" stroke-width="1.6"/>
+<line x1="122.3" y1="16.9" x2="124.8" y2="7.3" stroke-width="1.6"/>
+<line x1="132.9" y1="20.5" x2="136.7" y2="11.3" stroke-width="1.6"/>
+<line x1="140.0" y1="30.7" x2="148.0" y2="16.9" stroke-width="2.6"/>
+<line x1="152.4" y1="31.8" x2="158.4" y2="23.8" stroke-width="1.6"/>
+<line x1="160.8" y1="39.2" x2="167.9" y2="32.1" stroke-width="1.6"/>
+<line x1="168.2" y1="47.6" x2="176.2" y2="41.6" stroke-width="1.6"/>
+<line x1="169.3" y1="60.0" x2="183.1" y2="52.0" stroke-width="2.6"/>
+<line x1="179.5" y1="67.1" x2="188.7" y2="63.3" stroke-width="1.6"/>
+<line x1="183.1" y1="77.7" x2="192.7" y2="75.2" stroke-width="1.6"/>
+<line x1="185.3" y1="88.8" x2="195.2" y2="87.5" stroke-width="1.6"/>
+<line x1="180.0" y1="100.0" x2="196.0" y2="100.0" stroke-width="2.6"/>
+<line x1="185.3" y1="111.2" x2="195.2" y2="112.5" stroke-width="1.6"/>
+<line x1="183.1" y1="122.3" x2="192.7" y2="124.8" stroke-width="1.6"/>
+<line x1="179.5" y1="132.9" x2="188.7" y2="136.7" stroke-width="1.6"/>
+<line x1="169.3" y1="140.0" x2="183.1" y2="148.0" stroke-width="2.6"/>
+<line x1="168.2" y1="152.4" x2="176.2" y2="158.4" stroke-width="1.6"/>
+<line x1="160.8" y1="160.8" x2="167.9" y2="167.9" stroke-width="1.6"/>
+<line x1="152.4" y1="168.2" x2="158.4" y2="176.2" stroke-width="1.6"/>
+<line x1="140.0" y1="169.3" x2="148.0" y2="183.1" stroke-width="2.6"/>
+<line x1="132.9" y1="179.5" x2="136.7" y2="188.7" stroke-width="1.6"/>
+<line x1="122.3" y1="183.1" x2="124.8" y2="192.7" stroke-width="1.6"/>
+<line x1="111.2" y1="185.3" x2="112.5" y2="195.2" stroke-width="1.6"/>
+<line x1="100.0" y1="180.0" x2="100.0" y2="196.0" stroke-width="2.6"/>
+<line x1="88.8" y1="185.3" x2="87.5" y2="195.2" stroke-width="1.6"/>
+<line x1="77.7" y1="183.1" x2="75.2" y2="192.7" stroke-width="1.6"/>
+<line x1="67.1" y1="179.5" x2="63.3" y2="188.7" stroke-width="1.6"/>
+<line x1="60.0" y1="169.3" x2="52.0" y2="183.1" stroke-width="2.6"/>
+<line x1="47.6" y1="168.2" x2="41.6" y2="176.2" stroke-width="1.6"/>
+<line x1="39.2" y1="160.8" x2="32.1" y2="167.9" stroke-width="1.6"/>
+<line x1="31.8" y1="152.4" x2="23.8" y2="158.4" stroke-width="1.6"/>
+<line x1="30.7" y1="140.0" x2="16.9" y2="148.0" stroke-width="2.6"/>
+<line x1="20.5" y1="132.9" x2="11.3" y2="136.7" stroke-width="1.6"/>
+<line x1="16.9" y1="122.3" x2="7.3" y2="124.8" stroke-width="1.6"/>
+<line x1="14.7" y1="111.2" x2="4.8" y2="112.5" stroke-width="1.6"/>
+<line x1="20.0" y1="100.0" x2="4.0" y2="100.0" stroke-width="2.6"/>
+<line x1="14.7" y1="88.8" x2="4.8" y2="87.5" stroke-width="1.6"/>
+<line x1="16.9" y1="77.7" x2="7.3" y2="75.2" stroke-width="1.6"/>
+<line x1="20.5" y1="67.1" x2="11.3" y2="63.3" stroke-width="1.6"/>
+<line x1="30.7" y1="60.0" x2="16.9" y2="52.0" stroke-width="2.6"/>
+<line x1="31.8" y1="47.6" x2="23.8" y2="41.6" stroke-width="1.6"/>
+<line x1="39.2" y1="39.2" x2="32.1" y2="32.1" stroke-width="1.6"/>
+<line x1="47.6" y1="31.8" x2="41.6" y2="23.8" stroke-width="1.6"/>
+<line x1="60.0" y1="30.7" x2="52.0" y2="16.9" stroke-width="2.6"/>
+<line x1="67.1" y1="20.5" x2="63.3" y2="11.3" stroke-width="1.6"/>
+<line x1="77.7" y1="16.9" x2="75.2" y2="7.3" stroke-width="1.6"/>
+<line x1="88.8" y1="14.7" x2="87.5" y2="4.8" stroke-width="1.6"/>
+    </svg>
     <div class="gaugeInner">
+      <div class="timer" id="timer">Timer 00:00:00</div>
       <div class="paid" id="paid">00:00</div>
       <div class="caption">TOTAL PAID</div>
     </div>
