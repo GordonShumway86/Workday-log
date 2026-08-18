@@ -259,7 +259,7 @@ input[type=checkbox]{accent-color:var(--brand);width:19px;height:19px}
   <div class="eyebrow" style="margin-top:0">History</div>
   <div id="history" style="margin-top:4px"></div>
 </div>
-<div class="foot">Build 2026-08-13-a</div>
+<div class="foot">Build 2026-08-17-a</div>
 </main>
 
 <script>
@@ -472,6 +472,10 @@ function press(k){
   if(!d){alert("Press Start Day first.");return;}
 
   if(k==="end"){
+    if(!d.lunch){
+      alert("Choose 30, 60, or 90 (DTW/L/DTH) before pressing End Day.");
+      return;
+    }
     d.end={time:now(),note:d.end?.note||""};
     save();render();
     return;
